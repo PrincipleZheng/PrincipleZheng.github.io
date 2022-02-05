@@ -120,7 +120,7 @@
 <p>这时，我们要创建一个代理对象，实现UserDao接口类。</p>
 <p>来一个具体的例子：</p>
 <p>在一个package中有如下类和接口：</p>
-<p><img src="/.com//image-20220205210005720.png" alt="image-20220205210005720"></p>
+<p><img src="/../img/image-20220205210005720.png" alt="image-20220205210005720"></p>
 <p>UserDao接口：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">UserDao</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span>;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">update</span><span class="params">(String id)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -134,13 +134,12 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JDKProxy</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        Class[] interfaces = &#123;UserDao.class&#125;;</span><br><span class="line">        <span class="type">UserDaoImpl</span> <span class="variable">userDao</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UserDaoImpl</span>();</span><br><span class="line">        <span class="type">UserDao</span> <span class="variable">dao</span> <span class="operator">=</span> (UserDao) Proxy.newProxyInstance(JDKProxy.class.getClassLoader(), interfaces, <span class="keyword">new</span> <span class="title class_">UserDaoProxy</span>(userDao));</span><br><span class="line">        dao.add(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserDaoProxy</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Object obj;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UserDaoProxy</span><span class="params">(Object obj)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.obj = obj;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        <span class="comment">// before</span></span><br><span class="line">        System.out.println(<span class="string">&quot;before method:&quot;</span>+method.getName()+<span class="string">&quot; args:&quot;</span>+Arrays.toString(args));</span><br><span class="line">        <span class="comment">// execute method</span></span><br><span class="line">        <span class="type">Object</span> <span class="variable">res</span> <span class="operator">=</span> method.invoke(obj, args);</span><br><span class="line">        <span class="comment">// after</span></span><br><span class="line">        System.out.println(<span class="string">&quot;after method...&quot;</span>+obj);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>运行：</p>
-<p><img src="/.com//image-20220205210753667.png" alt="image-20220205210753667"></p>
-<img src="/.com//02/05/AOP/image-20220205210753667.png" class title="This is an example image">
+<p><img src="/../img/image-20220205210753667.png" alt="image-20220205210753667"></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/02/05/AOP/" data-id="ckz9vtfx00000dcb44aik4v83" data-title="AOP" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2022/02/05/AOP/" data-id="ckz9vvu340000cob4bk4z5fa8" data-title="AOP" class="article-share-link">分享</a>
       
       
       
@@ -194,7 +193,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/02/04/My-New-Post/" data-id="ckz9vtfx80003dcb40j33281k" data-title="My New Post" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2022/02/04/My-New-Post/" data-id="ckz9vvu3b0003cob4ea8r6rcv" data-title="My New Post" class="article-share-link">分享</a>
       
       
       
@@ -245,7 +244,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/02/04/hello-world/" data-id="ckz9vtfx50001dcb42hg39tdg" data-title="Hello World" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2022/02/04/hello-world/" data-id="ckz9vvu380001cob42gmx2j9h" data-title="Hello World" class="article-share-link">分享</a>
       
       
       
