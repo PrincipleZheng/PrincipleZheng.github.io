@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>动态规划 | Principle的Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="前言动态规划问题的一般形式就是求最值。动态规划其实是运筹学的一种最优化方法，只不过在计算机问题上应用比较多，比如求最长递增子序列呀，最小编辑距离等等。 求解动态规划的核心问题是穷举。因为要求最值，肯定要把所有可行的答案穷举出来。由于存在「重叠子问题」，如果暴力穷举的话效率会极其低下，所以需要「备忘录」或者&#x3D;&#x3D;「DP table」&#x3D;&#x3D;来优化穷举过程，避免不必要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动态规划">
+<meta property="og:url" content="https://evansblogs.com/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/index.html">
+<meta property="og:site_name" content="Principle的Blog">
+<meta property="og:description" content="前言动态规划问题的一般形式就是求最值。动态规划其实是运筹学的一种最优化方法，只不过在计算机问题上应用比较多，比如求最长递增子序列呀，最小编辑距离等等。 求解动态规划的核心问题是穷举。因为要求最值，肯定要把所有可行的答案穷举出来。由于存在「重叠子问题」，如果暴力穷举的话效率会极其低下，所以需要「备忘录」或者&#x3D;&#x3D;「DP table」&#x3D;&#x3D;来优化穷举过程，避免不必要">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evansblogs.com/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220207171506433.png">
+<meta property="og:image" content="https://evansblogs.com/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220208145302124.png">
+<meta property="og:image" content="https://evansblogs.com/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220208145339579.png">
+<meta property="article:published_time" content="2022-02-07T09:17:27.000Z">
+<meta property="article:modified_time" content="2022-02-08T07:39:08.367Z">
+<meta property="article:author" content="PrincipleZheng">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evansblogs.com/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220207171506433.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Principle的Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Principle的Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://evansblogs.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-动态规划" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" class="article-date">
+  <time class="dt-published" datetime="2022-02-07T09:17:27.000Z" itemprop="datePublished">2022-02-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      动态规划
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><strong>动态规划问题的一般形式就是求最值</strong>。动态规划其实是运筹学的一种最优化方法，只不过在计算机问题上应用比较多，比如求<strong>最长</strong>递增子序列呀，<strong>最小</strong>编辑距离等等。</p>
+<p><strong>求解动态规划的核心问题是穷举</strong>。因为要求最值，肯定要把所有可行的答案穷举出来。<strong>由于存在「重叠子问题」</strong>，如果暴力穷举的话效率会极其低下，所以需要「备忘录」或者&#x3D;&#x3D;「DP table」&#x3D;&#x3D;来优化穷举过程，避免不必要的计算。</p>
+<p>而且，动态规划问题一定会<strong>具备「最优子结构」</strong>，才能通过子问题的最值得到原问题的最值。</p>
+<p>另外，虽然动态规划的核心思想就是穷举求最值，但是问题可以千变万化，穷举所有可行解其实并不是一件容易的事，只有列出<strong>正确的「状态转移方程」</strong>，才能正确地穷举。</p>
+<h2 id="例1：斐波那契数列"><a href="#例1：斐波那契数列" class="headerlink" title="例1：斐波那契数列"></a>例1：斐波那契数列</h2><p><strong>暴力解法</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fib</span><span class="params">(<span class="type">int</span> N)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (N == <span class="number">1</span> || N == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> fib(N - <span class="number">1</span>) + fib(N - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>时间复杂度：子问题个数，即递归树中节点的总数。显然二叉树节点总数为指数级别，所以子问题个数为 O(2^n)。</p>
+<p>算法低效的原因：存在大量重复计算，比如 <code>f(18)</code> 被计算了两次，而且以 <code>f(18)</code> 为根的这个递归树体量巨大，多算一遍，会耗费巨大的时间。更何况，还不止 <code>f(18)</code> 这一个节点被重复计算。</p>
+<p><strong>改进</strong>-<strong>带备忘录的解法</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fib</span><span class="params">(<span class="type">int</span> N)</span> &#123;</span><br><span class="line">    <span class="comment">// 备忘录全初始化为 0</span></span><br><span class="line">    <span class="type">int</span>[] memo = <span class="keyword">new</span> <span class="title class_">int</span>[N + <span class="number">1</span>];</span><br><span class="line">    <span class="comment">// 进行带备忘录的递归</span></span><br><span class="line">    <span class="keyword">return</span> helper(memo, N);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">helper</span><span class="params">(<span class="type">int</span>[] memo, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span> || n == <span class="number">1</span>) <span class="keyword">return</span> n; <span class="comment">//起始两项为0和1</span></span><br><span class="line">    <span class="comment">// 在备忘录memo中查找</span></span><br><span class="line">    <span class="keyword">if</span> (memo[n] != <span class="number">0</span>) <span class="keyword">return</span> memo[n];</span><br><span class="line">    <span class="comment">// 没找到，只能递归计算</span></span><br><span class="line">    memo[n] = helper(memo, n - <span class="number">1</span>) + helper(memo, n - <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">return</span> memo[n];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>时间复杂度：不存在冗余计算，子问题就是 <code>f(1)</code>, <code>f(2)</code>, <code>f(3)</code> … <code>f(20)</code>，数量和输入规模 n &#x3D; 20 成正比，所以子问题个数为 O(n)。</p>
+<p><strong><code>dp</code> 数组的迭代（递推）解法</strong>：</p>
+<p>备忘录解法是自顶向下推的，比如求第20个，算19和18个，……，一直到1和2</p>
+<p>也可以从第1和2个出发，推导到我们要求的第n个数字。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fib</span><span class="params">(<span class="type">int</span> N)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (N == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[N + <span class="number">1</span>];</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span>; dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 状态转移</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">2</span>; i &lt;= N; i++) &#123;</span><br><span class="line">        dp[i] = dp[i - <span class="number">1</span>] + dp[i - <span class="number">2</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dp[N];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种迭代推法应该是大部分动态规划题的解题形式。核心的部分就是这个斐波那契数列的定义方程，即第三项等于前两项的和：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dp[i] = dp[i - <span class="number">1</span>] + dp[i - <span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+
+<p>所以说斐波那契数列这道题是最简单的例子：他直接给我们提供了这个<strong>状态转移方程</strong>。而实际解题时这个东西是要我们根据题意自己写出来的，也是动态规划题目的核心难点。</p>
+<p>还可以压缩空间：把空间复杂度降为 O(1)。不用保留整个数组，因为我们只要计算第N个是什么。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fib</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span> || n == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// base case</span></span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 分别代表 dp[i - 1] 和 dp[i - 2]</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">dp_i_1</span> <span class="operator">=</span> <span class="number">1</span>, dp_i_2 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="comment">// dp[i] = dp[i - 1] + dp[i - 2];</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">dp_i</span> <span class="operator">=</span> dp_i_1 + dp_i_2;</span><br><span class="line">        <span class="comment">// 滚动更新</span></span><br><span class="line">        dp_i_2 = dp_i_1;</span><br><span class="line">        dp_i_1 = dp_i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp_i_1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="例2：凑零钱问题"><a href="#例2：凑零钱问题" class="headerlink" title="例2：凑零钱问题"></a>例2：凑零钱问题</h2><p>给你 <code>k</code> 种面值的硬币，面值分别为 <code>c1, c2 ... ck</code>，每种硬币的数量无限，再给一个总金额 <code>amount</code>，问你<strong>最少</strong>需要几枚硬币凑出这个金额，如果不可能凑出，算法返回 -1 。算法的函数签名如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// coins 中是可选硬币面值，amount 是目标金额</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">coinChange</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>暴力递归</strong>：</p>
+<p>想求 <code>amount = 11</code> 时的最少硬币数（原问题），如果你知道凑出 <code>amount = 10</code> 的最少硬币数（子问题），你只需要把子问题的答案加一（再选一枚面值为 1 的硬币）就是原问题的答案。因为硬币的数量是没有限制的，所以子问题之间没有相互制，是互相独立的。</p>
+<p>1、<strong>确定 base case</strong>，这个很简单，显然目标金额 <code>amount</code> 为 0 时算法返回 0，因为不需要任何硬币就已经凑出目标金额了。</p>
+<p>2、<strong>确定「状态」，也就是原问题和子问题中会变化的变量</strong>。由于硬币数量无限，硬币的面额也是题目给定的，只有目标金额会不断地向 base case 靠近，所以唯一的「状态」就是目标金额 <code>amount</code>。</p>
+<p>3、<strong>确定「选择」，也就是导致「状态」产生变化的行为</strong>。目标金额为什么变化呢，因为你在选择硬币，你每选择一枚硬币，就相当于减少了目标金额。所以说所有硬币的面值，就是你的「选择」。</p>
+<p>4、<strong>明确 <code>dp</code> 函数&#x2F;数组的定义</strong>。我们这里讲的是自顶向下的解法，所以会有一个递归的 <code>dp</code> 函数，一般来说函数的参数就是状态转移中会变化的量，也就是上面说到的「状态」；函数的返回值就是题目要求我们计算的量。就本题来说，状态只有一个，即「目标金额」，题目要求我们计算凑出目标金额所需的最少硬币数量。所以我们可以这样定义 <code>dp</code> 函数：</p>
+<p><code>dp(n)</code> 的定义：输入一个目标金额 <code>n</code>，返回凑出目标金额 <code>n</code> 的最少硬币数量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">coinChange</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">    <span class="comment">// 题目要求的最终结果是 dp(amount)</span></span><br><span class="line">    <span class="keyword">return</span> dp(coins, amount)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dp</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">if</span> (amount == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (amount &lt; <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> Integer.MAX_VALUE;</span><br><span class="line">    <span class="comment">// 对于所有的coins种类，找到所需硬币最小的一个</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> coin : coins) &#123;</span><br><span class="line">        <span class="comment">// 计算子问题的结果</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">subProblem</span> <span class="operator">=</span> dp(coins, amount - coin);</span><br><span class="line">        <span class="comment">// 子问题无解则跳过</span></span><br><span class="line">        <span class="keyword">if</span> (subProblem == -<span class="number">1</span>) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="comment">// 在子问题中选择最优解，然后加一</span></span><br><span class="line">        res = Math.min(res, subProblem + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">return</span> <span class="variable">res</span> <span class="operator">=</span>= Integer.MAX_VALUE ? -<span class="number">1</span> : res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这道题的转移方程已经得到：<br>$$<br>dp(n)&#x3D;\left{<br>\begin{array}{rcl}<br>0 &amp;&amp;{n&#x3D;0}\<br>-1 &amp;&amp;{n&lt;0}\<br>min{dp(n-coin)+1|coin∈coins}       &amp;      &amp; {n &gt; 0}<br>\end{array} \right.<br>$$</p>
+<p><strong>带备忘录的递归</strong>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">coinChange</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">    memo = <span class="keyword">new</span> <span class="title class_">int</span>[amount+<span class="number">1</span>];</span><br><span class="line">    Arrays.fill(memo, -<span class="number">666</span>);</span><br><span class="line">    <span class="comment">// 题目要求的最终结果是 dp(amount)</span></span><br><span class="line">    <span class="keyword">return</span> dp(coins, amount)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dp</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">if</span> (amount == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (amount &lt; <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">	</span><br><span class="line">    <span class="keyword">if</span> (memo[amount] != -<span class="number">666</span>)</span><br><span class="line">       <span class="keyword">return</span> memo[amount];</span><br><span class="line">    </span><br><span class="line">    <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> Integer.MAX_VALUE;</span><br><span class="line">    <span class="comment">// 对于所有的coins种类，找到所需硬币最小的一个</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> coin : coins) &#123;</span><br><span class="line">        <span class="comment">// 计算子问题的结果</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">subProblem</span> <span class="operator">=</span> dp(coins, amount - coin);</span><br><span class="line">        <span class="comment">// 子问题无解则跳过</span></span><br><span class="line">        <span class="keyword">if</span> (subProblem == -<span class="number">1</span>) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="comment">// 在子问题中选择最优解，然后加一</span></span><br><span class="line">        res = Math.min(res, subProblem + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    memo[amount] = (res == Integer.MAX_VALUE) ? -<span class="number">1</span> : res;</span><br><span class="line">    <span class="keyword">return</span> memo[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>迭代递推法：</strong></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/coin-change/submissions/">https://leetcode-cn.com/problems/coin-change/submissions/</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">coinChange</span><span class="params">(<span class="type">int</span>[] coins, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[amount+<span class="number">1</span>];</span><br><span class="line">        Arrays.fill(dp, amount+<span class="number">1</span>);<span class="comment">//初始化为一个不可能达到的硬币个数</span></span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">1</span>; n &lt; amount+<span class="number">1</span>; n++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> coin : coins)&#123;</span><br><span class="line">                <span class="keyword">if</span>(n-coin&lt;<span class="number">0</span>)&#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> dp[n] = Math.min(dp[n-coin]+<span class="number">1</span>, dp[n]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (dp[amount]==amount+<span class="number">1</span>)?-<span class="number">1</span>:dp[amount];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>时间复杂度已经达到最优。</p>
+<p>压缩空间：比斐波那契的例子复杂很多。比如硬币是1、2、5面值，我要算10块钱的最小枚数，要知道9、8、5的最小值数，而我算11是，要的是10、9、6的最小枚数。如果只维护四个数据的空间是不够的。目前还没想明白怎么写。</p>
+<h2 id="例3：最长递增子序列"><a href="#例3：最长递增子序列" class="headerlink" title="例3：最长递增子序列"></a>例3：最长递增子序列</h2><p>Leetcode300，经典题目</p>
+<p>重点在于如何设计这个动态规划算法</p>
+<p>设计动态规划算法，不是需要一个 dp 数组吗？我们可以假设 <code>dp[0...i-1]</code> 都已经被算出来了，然后问自己：怎么通过这些结果算出 <code>dp[i]</code>？</p>
+<img src="/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220207171506433.png" alt="image-20220207171506433" style="zoom:80%;">
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">lengthOfLIS</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="comment">//动态规划</span></span><br><span class="line">        <span class="comment">//dp[i]代表以nums[i]结尾的严格递增子序列的长度</span></span><br><span class="line">        <span class="comment">//即对于[10,9,2,5,3,7,101,18]，dp[4]=2,以3结尾的串是2，3，长度为2</span></span><br><span class="line">        <span class="comment">//那么状态转移的过程应该是：从当前数字向前找一个比当前数字小的，且dp[i]最大的，加1</span></span><br><span class="line">        <span class="comment">//即对于dp[4]，nums[4]=3，前面比3小的只有2，2的nums索引是2，对应的dp[2]=1，故更新nums[4]=1+1</span></span><br><span class="line">        <span class="comment">//对于dp[7]，nums[7]=18，前面比18小的是10、9、2、5、3、7，其中对应最大dp的应该是7，他的dp[5]=3</span></span><br><span class="line">        <span class="comment">//故dp[7]=3+1=4，为答案。</span></span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[nums.length];</span><br><span class="line">        <span class="comment">//初始，不考虑其他的数字，则以nums[i]结尾的严格增序列是他本身，长度为1</span></span><br><span class="line">        Arrays.fill(dp, <span class="number">1</span>);</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; nums.length; i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; i; j++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(nums[j]&lt;nums[i])&#123;</span><br><span class="line">                    dp[i]=Math.max(dp[i],dp[j]+<span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> <span class="variable">max</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> <span class="number">0</span>; k &lt; dp.length; k++)&#123;</span><br><span class="line">            max = Math.max(max, dp[k]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> max;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​    </p>
+<h2 id="例4：下降路径最小和"><a href="#例4：下降路径最小和" class="headerlink" title="例4：下降路径最小和"></a>例4：下降路径最小和</h2><img src="/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220208145302124.png" alt="image-20220208145302124" style="zoom: %67;">
+
+<img src="/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/image-20220208145339579.png" alt="image-20220208145339579" style="zoom:67%;">
+
+<p>对于这道题目的分析：</p>
+<p>首先很明显是动态规划问题<br>从(row,col)到底下的最短路径长度 &#x3D; matrix(row,col) +<br>min{</p>
+<pre><code> 从(row+1,col)到底下的最短路径长度
+ 从(row+1,col-1)到底下的最短路径长度
+ 从(row+1,co1+1)到底下的最短路径长度
+</code></pre>
+<p> }</p>
+<p>备忘录法，未压缩空间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">minFallingPathSum</span><span class="params">(<span class="type">int</span>[][] matrix)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> matrix.length;</span><br><span class="line">        <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[size][size];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">            Arrays.fill(dp[i], <span class="number">100</span>*<span class="number">100</span>);<span class="comment">//根据题干的提示设定初始值，题目规定n最大100，每个数据最大100</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//最后一排 为basecase</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">            dp[size-<span class="number">1</span>][i] = matrix[size-<span class="number">1</span>][i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> size - <span class="number">2</span>; i &gt;= <span class="number">0</span>; i--)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; size; j++)&#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">nextDistance</span> <span class="operator">=</span> Math.min(j==<span class="number">0</span>?<span class="number">10000</span>:dp[i+<span class="number">1</span>][j-<span class="number">1</span>], dp[i+<span class="number">1</span>][j]);</span><br><span class="line">                nextDistance = Math.min(nextDistance, j==size-<span class="number">1</span>?<span class="number">10000</span>:dp[i+<span class="number">1</span>][j+<span class="number">1</span>]);</span><br><span class="line">                dp[i][j] = matrix[i][j] + nextDistance;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> <span class="number">10000</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">            res = Math.min(res, dp[<span class="number">0</span>][i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>压缩空间到两个一维数组。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">minFallingPathSum</span><span class="params">(<span class="type">int</span>[][] matrix)</span> &#123;</span><br><span class="line">        <span class="comment">// 动态规划问题</span></span><br><span class="line">        <span class="comment">// 从(row,col)到底下的最短路径长度 = matrix(row,col) + </span></span><br><span class="line">        <span class="comment">// min&#123;</span></span><br><span class="line">        <span class="comment">//  从(row+1,col)到底下的最短路径长度</span></span><br><span class="line">        <span class="comment">//  从(row+1,col-1)到底下的最短路径长度</span></span><br><span class="line">        <span class="comment">//  从(row+1,co1+1)到底下的最短路径长度</span></span><br><span class="line">        <span class="comment">// &#125;</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> matrix.length;</span><br><span class="line">        <span class="type">int</span>[] dpTemp = <span class="keyword">new</span> <span class="title class_">int</span>[size];</span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[size];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">            Arrays.fill(dp, <span class="number">100</span>*<span class="number">100</span>);<span class="comment">//根据题干的提示设定初始值</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//最后一排 为basecase</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">            dpTemp[i] = matrix[size-<span class="number">1</span>][i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> size - <span class="number">2</span>; i &gt;= <span class="number">0</span>; i--)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; size; j++)&#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">nextDistance</span> <span class="operator">=</span> Math.min(j==<span class="number">0</span>?<span class="number">10000</span>:dpTemp[j-<span class="number">1</span>], dpTemp[j]);</span><br><span class="line">                nextDistance = Math.min(nextDistance, j==size-<span class="number">1</span>?<span class="number">10000</span>:dpTemp[j+<span class="number">1</span>]);</span><br><span class="line">                dp[j] = matrix[i][j] + nextDistance;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">num</span> <span class="operator">=</span> <span class="number">0</span>; num &lt; size; num++)&#123;</span><br><span class="line">                dpTemp[num] = dp[num];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> <span class="number">10000</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)&#123;</span><br><span class="line">            res = Math.min(res, dpTemp[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>部分参考：<a target="_blank" rel="noopener" href="https://labuladong.github.io/">https://labuladong.github.io/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://evansblogs.com/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" data-id="ckzchfng20000mcb49f7ybny3" data-title="动态规划" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2022/02/05/%E5%BB%BA%E7%AB%8Bblog%E7%9A%84%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">建立blog的问题</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java%E5%AD%A6%E4%B9%A0/" rel="tag">Java学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring%E5%AD%A6%E4%B9%A0/" rel="tag">Spring学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9D%82%E9%A1%B9/" rel="tag">杂项</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">Java学习</a> <a href="/tags/Spring%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">Spring学习</a> <a href="/tags/%E6%9D%82%E9%A1%B9/" style="font-size: 10px;">杂项</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">二月 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/05/%E5%BB%BA%E7%AB%8Bblog%E7%9A%84%E9%97%AE%E9%A2%98/">建立blog的问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/05/AOP/">AOP</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/04/Comparator%E6%8E%A5%E5%8F%A3/">Comparator接口</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/04/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 PrincipleZheng<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
