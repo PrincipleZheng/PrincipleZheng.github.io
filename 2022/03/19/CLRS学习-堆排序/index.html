@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>CLRS学习-堆排序 | Principle的Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="CLRS学习-堆排序堆结构二叉堆，数组存储，看似近似完全的二叉树，除了最低层，全是满的。表示堆的数组有两个属性：  A.length  数组元素的个数  A.heap-size 堆元素的个数（小于等于length）  对于一个下标为i的节点：parent(i) &#x3D; ⌊i&#x2F;2⌋left(i) &#x3D; 2iright(i) &#x3D; 2i+1 这里返回的都是索引值，节点的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CLRS学习-堆排序">
+<meta property="og:url" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/index.html">
+<meta property="og:site_name" content="Principle的Blog">
+<meta property="og:description" content="CLRS学习-堆排序堆结构二叉堆，数组存储，看似近似完全的二叉树，除了最低层，全是满的。表示堆的数组有两个属性：  A.length  数组元素的个数  A.heap-size 堆元素的个数（小于等于length）  对于一个下标为i的节点：parent(i) &#x3D; ⌊i&#x2F;2⌋left(i) &#x3D; 2iright(i) &#x3D; 2i+1 这里返回的都是索引值，节点的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/image-20220319170139374.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/image-20220319170213194.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/JCzJEy5oplIfZ8walFxh3e-LxfBkveCEeXnB6ycDmAY.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/6JxMIjIePDU69pyQ78HG4UcLISr2mLiSJeWBC5XLwC8.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/qkjastYq60sFKcFKzx01glxTu6sKG-TUJ3PIgzbC5ww.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/3ZagDoMVIk9LUnbJCjiOKzsQ2rT_AxFPCYkNdsOMVW0.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/u1GChYabKNKHp_bIOejGcccG2zdiBhIoNdN3YnP7MgA.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/h8ctfhojZyCV3KgH0q1HNCXeoUuYASWlwJRb8RjtWxI.png">
+<meta property="og:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/Ggkq5DspfoO2fCokS2PxXjtYeTJG6d7ZCCgd47Y4BMc.png">
+<meta property="article:published_time" content="2022-03-19T09:03:30.000Z">
+<meta property="article:modified_time" content="2022-03-19T09:07:53.969Z">
+<meta property="article:author" content="PrincipleZheng">
+<meta property="article:tag" content="数据结构与算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/image-20220319170139374.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Principle的Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Principle的Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://evansblogs.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-CLRS学习-堆排序" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/" class="article-date">
+  <time class="dt-published" datetime="2022-03-19T09:03:30.000Z" itemprop="datePublished">2022-03-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      CLRS学习-堆排序
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="CLRS学习-堆排序"><a href="#CLRS学习-堆排序" class="headerlink" title="CLRS学习-堆排序"></a>CLRS学习-堆排序</h1><h1 id="堆结构"><a href="#堆结构" class="headerlink" title="堆结构"></a>堆结构</h1><p>二叉堆，数组存储，看似近似完全的二叉树，除了最低层，全是满的。<br>表示堆的数组有两个属性：</p>
+<ol>
+<li>A.length  数组元素的个数 </li>
+<li>A.heap-size 堆元素的个数（小于等于length）</li>
+</ol>
+<p>对于一个下标为<code>i</code>的节点：<br>parent(i) &#x3D; ⌊i&#x2F;2⌋<br>left(i) &#x3D; 2i<br>right(i) &#x3D; 2i+1</p>
+<p>这里返回的都是索引值，节点的val通过A[i]访问</p>
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/image-20220319170139374.png" alt="image-20220319170139374" style="zoom:80%;">
+
+<p>最大堆：除了根节点，所有的节点满足父节点值大于等于本节点值<br>最小堆：除了根节点，所有的节点满足父节点值小于等于本节点值</p>
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/image-20220319170213194.png" alt="image-20220319170213194" style="zoom:80%;">
+
+<h1 id="维护堆"><a href="#维护堆" class="headerlink" title="维护堆"></a>维护堆</h1><p>逐级下降。输入数组A和下标i，i表示根节点的位置。</p>
+<p>从根节点出发，判断左右子节点是否比自己大，得到其中更大的一个，和根节点交换。</p>
+<p>交换后递归处理交换的节点为根的子树。</p>
+<p><strong>注意：这个函数并不能处理完全无序的堆，调用时假定根节点为 LEFT(i) 和 RIGHT(i) 的二叉树都是最大堆</strong></p>
+<p>MAX-HEAPIFY(A, i)</p>
+<figure class="highlight plaintext"><figcaption><span>Text</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">l = left(i)</span><br><span class="line">r = right(i)</span><br><span class="line">if l &lt;= A.heap-size and A[l]&gt;A[i]</span><br><span class="line">    largest = l</span><br><span class="line">else largest = i</span><br><span class="line">if r &lt;= A.heap-size and A[r]&gt;A[largest]</span><br><span class="line">    largest = r</span><br><span class="line">if largest != i</span><br><span class="line">    exchange A[i] with A[largest]</span><br><span class="line">    MAX_HEAPIFY(A, largest)</span><br></pre></td></tr></table></figure>
+
+<p>分析：</p>
+<p>对于一颗大小为n的树的输入，<br>调整根和左右子节点的时间代价O(1) +  在一个i的子节点为根的子树上运行MAX-HEAPIFY<br>最坏情况：子树的底层是半满的，此时该开销为T(2n&#x2F;3)</p>
+<p> $T(n)≤T(2n&#x2F;3)+O(1)$ 由主定理情况2  $T(n)&#x3D; O(lgn)$ </p>
+<p>也就是说，对于一个树高为h的节点来说，其时间复杂度为O(h)</p>
+<h1 id="建立堆"><a href="#建立堆" class="headerlink" title="建立堆"></a>建立堆</h1><p>我们采用自底向上的方法建立堆：叶节点就是已经建好的只有一个元素的堆</p>
+<p>哪些元素是叶子节点？ $A(⌊n&#x2F;2⌋+1 …… n)$ </p>
+<p>BUILD-MAX-HEAP(A)</p>
+<figure class="highlight plaintext"><figcaption><span>Text</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A.heap-size = A.length //以A的全部元素为堆元素建立堆</span><br><span class="line">for i = ⌊A.length/2⌋ downto 1</span><br><span class="line">    MAX-HEAPIFY(A, i)</span><br></pre></td></tr></table></figure>
+
+<p>循环不变量：在第2-3行for循环开始，节点 i+1 … n 都是一个最大堆的根节点</p>
+<p>证明循环不变量的正确性：</p>
+<ul>
+<li>初始化  …</li>
+<li>保持 …</li>
+<li>终止 …</li>
+</ul>
+<p>估算时间复杂度：O(n)次调用O(lgn)的函数 → O(nlgn)</p>
+<p>这个上界不是渐进紧确的 “is not asymptotically tight”</p>
+<p>我们利用一些性质计算更准确的上界：</p>
+<ul>
+<li>包含n个元素的堆的高度为lgn（向下取整）</li>
+<li>对于一个n个元素的堆，至多 $n&#x2F;2^{h+1}$ （向上取整）个节点，高度为h</li>
+</ul>
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/JCzJEy5oplIfZ8walFxh3e-LxfBkveCEeXnB6ycDmAY.png" alt="image" style="zoom:80%;">
+
+<h1 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h1><p>初始：利用BUILD-MAX-HEAP将输入数组A建立成最大堆</p>
+<p>此时，数组中最大的元素在根节点A[1]，把它和A[n]互换，而后将它从堆中去掉（heapsize-1）</p>
+<p>新的根节点可能会违背最大堆得性质，调用MAX-HEAPIFY(A, 1)</p>
+<p>不断重复以上的过程</p>
+<p>很容易分析：这个算法的时间复杂度为O(lgn)</p>
+<p>HEAPSORT(A)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BUILD_MAX_HEAP(A) <span class="comment">//O(n)</span></span><br><span class="line"><span class="type">for</span> <span class="variable">i</span> <span class="operator">=</span> A.length downto <span class="number">2</span> <span class="comment">//O(n)</span></span><br><span class="line">    exchange A[<span class="number">1</span>] with A[i]</span><br><span class="line">    A.heapsize = A.heapsize-<span class="number">1</span></span><br><span class="line">    MAX-HEAPIFY(A, <span class="number">1</span>)  <span class="comment">// O(lgn)</span></span><br></pre></td></tr></table></figure>
+
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/6JxMIjIePDU69pyQ78HG4UcLISr2mLiSJeWBC5XLwC8.png" alt="image" style="zoom:80%;">
+
+<h1 id="优先队列"><a href="#优先队列" class="headerlink" title="优先队列"></a>优先队列</h1><p>这里我们关注如何基于堆实现优先队列</p>
+<p>优先队列和堆一样也分为最大、最小优先队列</p>
+<p>优先队列维护集合S，其中的每一个元素都有一个相关的值称为key</p>
+<p>最大优先队列的一系列接口：</p>
+<ul>
+<li>INSERT(S, x)，把元素x插入集合S中</li>
+<li>MAXIMUM(S)，返回具有最大关键字的元素</li>
+<li>EXTRACT-MAX(S)，去掉最大的元素并返回</li>
+<li>INCREASE-KEY(S, x, k) 将元素 x 的 key 增加到 k，k&gt;&#x3D;x</li>
+</ul>
+<p>如何用堆实现：</p>
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/qkjastYq60sFKcFKzx01glxTu6sKG-TUJ3PIgzbC5ww.png" alt="image" style="zoom:80%;">
+
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/3ZagDoMVIk9LUnbJCjiOKzsQ2rT_AxFPCYkNdsOMVW0.png" alt="image" style="zoom:80%;">
+
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/u1GChYabKNKHp_bIOejGcccG2zdiBhIoNdN3YnP7MgA.png" alt="image" style="zoom:80%;">
+
+<p>这个increase key的函数将节点值改变后向上寻找合适的位置，直到满足最大堆的要求</p>
+<p>以高度计算时间复杂度：O(lgn)</p>
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/h8ctfhojZyCV3KgH0q1HNCXeoUuYASWlwJRb8RjtWxI.png" alt="image" style="zoom:80%;">
+
+<img src="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/Ggkq5DspfoO2fCokS2PxXjtYeTJG6d7ZCCgd47Y4BMc.png" alt="image" style="zoom:80%;">
+
+<p>新加一个值最小的节点，再调用之前实现的增大节点值的函数，合理复用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://evansblogs.com/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/" data-id="cl0xmo8ua0001dgb460vjbwz3" data-title="CLRS学习-堆排序" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2022/02/13/%E5%9B%BE/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">图</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java%E5%AD%A6%E4%B9%A0/" rel="tag">Java学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring%E5%AD%A6%E4%B9%A0/" rel="tag">Spring学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%B6%E4%BB%96/" rel="tag">其他</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9D%82%E9%A1%B9/" rel="tag">杂项</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">Java学习</a> <a href="/tags/Spring%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">Spring学习</a> <a href="/tags/%E5%85%B6%E4%BB%96/" style="font-size: 10px;">其他</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" style="font-size: 10px;">数据结构与算法</a> <a href="/tags/%E6%9D%82%E9%A1%B9/" style="font-size: 10px;">杂项</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 20px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">二月 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/03/19/CLRS%E5%AD%A6%E4%B9%A0-%E5%A0%86%E6%8E%92%E5%BA%8F/">CLRS学习-堆排序</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/13/%E5%9B%BE/">图</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/12/Markdown%E7%BB%98%E5%9B%BE/">Markdown绘图</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/11/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树</a>
+          </li>
+        
+          <li>
+            <a href="/2022/02/07/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 PrincipleZheng<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
