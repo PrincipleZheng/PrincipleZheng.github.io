@@ -2,11 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Netty 的 EventLoop 编排 on Evan&#39;s Site</title>
-    <link>http://localhost:1313/blogs/netty-eventloop/</link>
+    <link>https://principlezheng.github.io/blogs/netty-eventloop/</link>
     <description>Recent content in Netty 的 EventLoop 编排 on Evan&#39;s Site</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate></lastBuildDate>
-    <atom:link href="http://localhost:1313/blogs/netty-eventloop/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://principlezheng.github.io/blogs/netty-eventloop/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
