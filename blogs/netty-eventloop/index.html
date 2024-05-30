@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html>
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta http-equiv="Accept-CH" content="DPR, Viewport-Width, Width">
+<link rel="icon" href=/snowflake.png type="image/gif">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      media="print" onload="this.media='all'" />
+<noscript>
+  <link
+          href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+          rel="stylesheet">
+</noscript>
+
+
+<link rel="stylesheet" href="/css/font.css" media="all">
+
+
+
+  
+
+
+<meta property="og:url" content="http://localhost:1313/blogs/netty-eventloop/">
+  <meta property="og:site_name" content="Evan&#39;s Site">
+  <meta property="og:title" content="Netty 的 EventLoop 编排">
+  <meta property="og:description" content="介绍 EventLoop：事件循环对象，可以理解为在 netty 中处理数据的工人
+EventLoop 本质是一个单线程执行器（同时维护了一个 Selector），里面有 run 方法处理 Channel 上源源不断的 io 事件。
+它的继承关系比较复杂
+一条线是继承自 j.u.c.ScheduledExecutorService 因此包含了线程池中所有的方法 另一条线是继承自 netty 自己的 OrderedEventExecutor， 提供了 boolean inEventLoop(Thread thread) 方法判断一个线程是否属于此 EventLoop 提供了 parent 方法来看看自己属于哪个 EventLoopGroup 事件循环组
+EventLoopGroup 是一组 EventLoop，Channel 一般会调用 EventLoopGroup 的 register 方法来绑定其中一个 EventLoop，后续这个 Channel 上的 io 事件都由此 EventLoop 来处理（保证了 io 事件处理时的线程安全）
+继承自 netty 自己的 EventExecutorGroup 实现了 Iterable 接口提供遍历 EventLoop 的能力 另有 next 方法获取集合中下一个 EventLoop 以一个简单的实现为例：
+// 内部创建了两个 EventLoop, 每个 EventLoop 维护一个线程 DefaultEventLoopGroup group = new DefaultEventLoopGroup(2); System.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blogs">
+    <meta property="article:published_time" content="2024-05-29T19:53:33+05:30">
+    <meta property="article:modified_time" content="2024-05-29T19:53:33+05:30">
+    <meta property="article:tag" content="Netty">
+    <meta property="article:tag" content="Backend Development">
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Netty 的 EventLoop 编排">
+  <meta name="twitter:description" content="介绍 EventLoop：事件循环对象，可以理解为在 netty 中处理数据的工人
+EventLoop 本质是一个单线程执行器（同时维护了一个 Selector），里面有 run 方法处理 Channel 上源源不断的 io 事件。
+它的继承关系比较复杂
+一条线是继承自 j.u.c.ScheduledExecutorService 因此包含了线程池中所有的方法 另一条线是继承自 netty 自己的 OrderedEventExecutor， 提供了 boolean inEventLoop(Thread thread) 方法判断一个线程是否属于此 EventLoop 提供了 parent 方法来看看自己属于哪个 EventLoopGroup 事件循环组
+EventLoopGroup 是一组 EventLoop，Channel 一般会调用 EventLoopGroup 的 register 方法来绑定其中一个 EventLoop，后续这个 Channel 上的 io 事件都由此 EventLoop 来处理（保证了 io 事件处理时的线程安全）
+继承自 netty 自己的 EventExecutorGroup 实现了 Iterable 接口提供遍历 EventLoop 的能力 另有 next 方法获取集合中下一个 EventLoop 以一个简单的实现为例：
+// 内部创建了两个 EventLoop, 每个 EventLoop 维护一个线程 DefaultEventLoopGroup group = new DefaultEventLoopGroup(2); System.">
+
+
+<link rel="stylesheet" href="/bootstrap-5/css/bootstrap.min.css" media="all"><link rel="stylesheet" href="/css/header.css" media="all">
+<link rel="stylesheet" href="/css/footer.css" media="all">
+
+
+<link rel="stylesheet" href="/css/theme.css" media="all">
+
+
+
+
+<style>
+    :root {
+        --text-color: #343a40;
+        --text-secondary-color: #6c757d;
+        --background-color: #eaedf0;
+        --secondary-background-color: #64ffda1a;
+        --primary-color: #007bff;
+        --secondary-color: #f8f9fa;
+
+         
+        --text-color-dark: #e4e6eb;
+        --text-secondary-color-dark: white;
+        --background-color-dark: #18191a;
+        --secondary-background-color-dark: gray;
+        --primary-color-dark: springgreen;
+        --secondary-color-dark: #212529;
+    }
+    body {
+        font-size: 1.2rem;
+        font-weight: 400;
+        line-height: 2;
+        text-align: left;
+    }
+
+    html {
+        background-color: var(--background-color) !important;
+    }
+
+    body::-webkit-scrollbar {
+        height: 0px;
+        width: 8px;
+        background-color: var(--background-color);
+    }
+    
+    ::-webkit-scrollbar-track {
+        border-radius: 1rem;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        border-radius: 1rem;
+        background: #b0b0b0;
+        outline: 1px solid var(--background-color);
+    }
+
+    #search-content::-webkit-scrollbar {
+        width: .5em;
+        height: .1em;
+        background-color: var(--background-color);
+    }
+</style>
+
+
+<meta name="description" content="">
+<link rel="stylesheet" href="/css/single.css">
+
+
+<script defer src="/fontawesome-6/all-6.4.2.js"></script>
+
+  <title>
+Netty 的 EventLoop 编排 | Evan&#39;s Site
+
+  </title>
+</head>
+
+<body class="light">
+  
+  
+<script>
+    let localStorageValue = localStorage.getItem("pref-theme");
+    let mediaQuery = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    switch (localStorageValue) {
+        case "dark":
+            document.body.classList.add('dark');
+            break;
+        case "light":
+            document.body.classList.remove('dark');
+            break;
+        default:
+            if (mediaQuery) {
+                document.body.classList.add('dark');
+            }
+            break;
+    }
+</script>
+
+
+
+
+<script>
+    var prevScrollPos = window.pageYOffset;
+    window.addEventListener("scroll", function showHeaderOnScroll() {
+        let profileHeaderElem = document.getElementById("profileHeader");
+        let currentScrollPos = window.pageYOffset;
+        let resetHeaderStyle = false;
+        let showNavBarOnScrollUp =  true ;
+        let showNavBar = showNavBarOnScrollUp ? prevScrollPos > currentScrollPos : currentScrollPos > 0;
+        if (showNavBar) {
+            profileHeaderElem.classList.add("showHeaderOnTop");
+        } else {
+            resetHeaderStyle = true;
+        }
+        if(currentScrollPos === 0) {
+            resetHeaderStyle = true;
+        }
+        if(resetHeaderStyle) {
+            profileHeaderElem.classList.remove("showHeaderOnTop");
+        }
+        prevScrollPos = currentScrollPos;        
+    });
+</script>
+
+
+
+<header id="profileHeader">
+    <nav class="pt-3 navbar navbar-expand-lg animate">
+        <div class="container-fluid mx-xs-2 mx-sm-5 mx-md-5 mx-lg-5">
+            
+            <a class="navbar-brand primary-font text-wrap" href="/">
+                
+                Evan&#39;s Site
+                
+            </a>
+
+            
+
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <svg aria-hidden="true" height="24" viewBox="0 0 16 16" version="1.1" width="24" data-view-component="true">
+                    <path fill-rule="evenodd" d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z"></path>
+                </svg>
+            </button>
+
+            
+            <div class="collapse navbar-collapse text-wrap primary-font" id="navbarContent">
+                <ul class="navbar-nav ms-auto text-center">
+                    
+
+                    
+
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/#education"
+                            aria-label="education">
+                            Education
+                        </a>
+                    </li>
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/#projects"
+                            aria-label="projects">
+                            Projects
+                        </a>
+                    </li>
+                    
+
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/#contact"
+                            aria-label="contact">
+                            Contact
+                        </a>
+                    </li>
+                    
+
+                    
+                    
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/blogs" title="Blog posts">
+                            
+                            Blog
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li class="nav-item navbar-text">
+                        <a class="nav-link" href="/gallery" title="Blog posts">
+                            
+                            Gallery
+                        </a>
+                    </li>
+                    
+                    
+
+                    
+                    <li class="nav-item navbar-text">
+                        
+                        <div class="text-center">
+                            <button id="theme-toggle">
+                                <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                                <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="5"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                    
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+</header>
+<div id="content">
+<section id="single">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-sm-12 col-md-12 col-lg-9">
+        <div class="pr-lg-4">
+          <div class="title mb-5">
+            <h1 class="text-center mb-4">Netty 的 EventLoop 编排</h1>
+            <div class="text-center">
+              Evan Zheng 
+              <small>|</small>
+              May 29, 2024
+
+              
+              <span id="readingTime">
+                min read
+              </span>
+              
+            </div>
+          </div>
+          
+          <div class="featured-image">
+            <img class="img-fluid mx-auto d-block" src="/images/blogs/nettty.png" alt="Netty 的 EventLoop 编排">
+          </div>
+          
+          <article class="page-content  p-2">
+          <h2 id="介绍">介绍</h2>
+<p>EventLoop：事件循环对象，可以理解为在 netty 中处理数据的工人</p>
+<p>EventLoop 本质是一个单线程执行器（同时维护了一个 Selector），里面有 run 方法处理 Channel 上源源不断的 io 事件。</p>
+<p>它的继承关系比较复杂</p>
+<ul>
+<li>一条线是继承自 j.u.c.ScheduledExecutorService 因此包含了线程池中所有的方法</li>
+<li>另一条线是继承自 netty 自己的 OrderedEventExecutor，
+<ul>
+<li>提供了 boolean inEventLoop(Thread thread) 方法判断一个线程是否属于此 EventLoop</li>
+<li>提供了 parent 方法来看看自己属于哪个 EventLoopGroup</li>
+</ul>
+</li>
+</ul>
+<p>事件循环组</p>
+<p>EventLoopGroup 是一组 EventLoop，Channel 一般会调用 EventLoopGroup 的 register 方法来绑定其中一个 EventLoop，后续这个 Channel 上的 io 事件都由此 EventLoop 来处理（保证了 io 事件处理时的线程安全）</p>
+<ul>
+<li>继承自 netty 自己的 EventExecutorGroup
+<ul>
+<li>实现了 Iterable 接口提供遍历 EventLoop 的能力</li>
+<li>另有 next 方法获取集合中下一个 EventLoop</li>
+</ul>
+</li>
+</ul>
+<p>以一个简单的实现为例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// 内部创建了两个 EventLoop, 每个 EventLoop 维护一个线程</span>
+</span></span><span style="display:flex;"><span>DefaultEventLoopGroup group <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DefaultEventLoopGroup(2);
+</span></span><span style="display:flex;"><span>System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(group.<span style="color:#a6e22e">next</span>());
+</span></span><span style="display:flex;"><span>System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(group.<span style="color:#a6e22e">next</span>());
+</span></span><span style="display:flex;"><span>System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(group.<span style="color:#a6e22e">next</span>());
+</span></span></code></pre></div><p>输出</p>
+<pre tabindex="0"><code>io.netty.channel.DefaultEventLoop@60f82f98
+io.netty.channel.DefaultEventLoop@35f983a6
+io.netty.channel.DefaultEventLoop@60f82f98
+</code></pre><p>也可以使用 for 循环</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>DefaultEventLoopGroup group <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DefaultEventLoopGroup(2);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (EventExecutor eventLoop : group) {
+</span></span><span style="display:flex;"><span>    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(eventLoop);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="demo">Demo</h2>
+<p>服务器端两个 nio worker 工人，一个 boss 处理 accept 事件 （group 参数顺序决定的）</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">new</span> ServerBootstrap()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">group</span>(<span style="color:#66d9ef">new</span> NioEventLoopGroup(1), <span style="color:#66d9ef">new</span> NioEventLoopGroup(2))
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">channel</span>(NioServerSocketChannel.<span style="color:#a6e22e">class</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">childHandler</span>(<span style="color:#66d9ef">new</span> ChannelInitializer<span style="color:#f92672">&lt;</span>NioSocketChannel<span style="color:#f92672">&gt;</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">initChannel</span>(NioSocketChannel ch) {
+</span></span><span style="display:flex;"><span>            ch.<span style="color:#a6e22e">pipeline</span>().<span style="color:#a6e22e">addLast</span>(<span style="color:#66d9ef">new</span> ChannelInboundHandlerAdapter() {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">channelRead</span>(ChannelHandlerContext ctx, Object msg) {
+</span></span><span style="display:flex;"><span>                    ByteBuf byteBuf <span style="color:#f92672">=</span> msg <span style="color:#66d9ef">instanceof</span> ByteBuf <span style="color:#f92672">?</span> ((ByteBuf) msg) : <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (byteBuf <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> buf <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>16<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>                        ByteBuf len <span style="color:#f92672">=</span> byteBuf.<span style="color:#a6e22e">readBytes</span>(buf, 0, byteBuf.<span style="color:#a6e22e">readableBytes</span>());
+</span></span><span style="display:flex;"><span>                        log.<span style="color:#a6e22e">debug</span>(<span style="color:#66d9ef">new</span> String(buf));
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }).<span style="color:#a6e22e">bind</span>(8080).<span style="color:#a6e22e">sync</span>();
+</span></span></code></pre></div><p>客户端，启动三次，分别修改发送字符串为 zhangsan（第一次），lisi（第二次），wangwu（第三次）</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> InterruptedException {
+</span></span><span style="display:flex;"><span>    Channel channel <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Bootstrap()
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">group</span>(<span style="color:#66d9ef">new</span> NioEventLoopGroup(1))
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">handler</span>(<span style="color:#66d9ef">new</span> ChannelInitializer<span style="color:#f92672">&lt;</span>NioSocketChannel<span style="color:#f92672">&gt;</span>() {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">initChannel</span>(NioSocketChannel ch) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>                    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;init...&#34;</span>);
+</span></span><span style="display:flex;"><span>                    ch.<span style="color:#a6e22e">pipeline</span>().<span style="color:#a6e22e">addLast</span>(<span style="color:#66d9ef">new</span> LoggingHandler(LogLevel.<span style="color:#a6e22e">DEBUG</span>));
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">channel</span>(NioSocketChannel.<span style="color:#a6e22e">class</span>).<span style="color:#a6e22e">connect</span>(<span style="color:#e6db74">&#34;localhost&#34;</span>, 8080)
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">sync</span>()
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">channel</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    channel.<span style="color:#a6e22e">writeAndFlush</span>(ByteBufAllocator.<span style="color:#a6e22e">DEFAULT</span>.<span style="color:#a6e22e">buffer</span>().<span style="color:#a6e22e">writeBytes</span>(<span style="color:#e6db74">&#34;wangwu&#34;</span>.<span style="color:#a6e22e">getBytes</span>()));
+</span></span><span style="display:flex;"><span>    Thread.<span style="color:#a6e22e">sleep</span>(2000);
+</span></span><span style="display:flex;"><span>    channel.<span style="color:#a6e22e">writeAndFlush</span>(ByteBufAllocator.<span style="color:#a6e22e">DEFAULT</span>.<span style="color:#a6e22e">buffer</span>().<span style="color:#a6e22e">writeBytes</span>(<span style="color:#e6db74">&#34;wangwu&#34;</span>.<span style="color:#a6e22e">getBytes</span>()));
+</span></span></code></pre></div><p>最后输出</p>
+<pre tabindex="0"><code>22:03:34 [DEBUG] [nioEventLoopGroup-3-1] c.i.o.EventLoopTest - zhangsan       
+22:03:36 [DEBUG] [nioEventLoopGroup-3-1] c.i.o.EventLoopTest - zhangsan       
+22:05:36 [DEBUG] [nioEventLoopGroup-3-2] c.i.o.EventLoopTest - lisi           
+22:05:38 [DEBUG] [nioEventLoopGroup-3-2] c.i.o.EventLoopTest - lisi           
+22:06:09 [DEBUG] [nioEventLoopGroup-3-1] c.i.o.EventLoopTest - wangwu        
+22:06:11 [DEBUG] [nioEventLoopGroup-3-1] c.i.o.EventLoopTest - wangwu         
+</code></pre><p>可以看到两个工人轮流处理 channel，但工人与 channel 之间进行了绑定</p>
+<p>示意图是：</p>
+<p><img src="/images/blogs/image-20240527001846498.png" alt="image-20240527001846498"></p>
+<p>再增加两个非 nio 工人 normalWorkers，隶属于 DefaultEventLoopGroup</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>DefaultEventLoopGroup normalWorkers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DefaultEventLoopGroup(2); <span style="color:#75715e">//there</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">new</span> ServerBootstrap()
+</span></span><span style="display:flex;"><span>  	<span style="color:#75715e">// boss：accept 和 worker：读写</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">group</span>(<span style="color:#66d9ef">new</span> NioEventLoopGroup(1), <span style="color:#66d9ef">new</span> NioEventLoopGroup(2))
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">channel</span>(NioServerSocketChannel.<span style="color:#a6e22e">class</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">childHandler</span>(<span style="color:#66d9ef">new</span> ChannelInitializer<span style="color:#f92672">&lt;</span>NioSocketChannel<span style="color:#f92672">&gt;</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">initChannel</span>(NioSocketChannel ch)  {
+</span></span><span style="display:flex;"><span>            ch.<span style="color:#a6e22e">pipeline</span>().<span style="color:#a6e22e">addLast</span>(<span style="color:#66d9ef">new</span> LoggingHandler(LogLevel.<span style="color:#a6e22e">DEBUG</span>));
+</span></span><span style="display:flex;"><span>            ch.<span style="color:#a6e22e">pipeline</span>().<span style="color:#a6e22e">addLast</span>(normalWorkers,<span style="color:#e6db74">&#34;myhandler&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">new</span> ChannelInboundHandlerAdapter() {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">channelRead</span>(ChannelHandlerContext ctx, Object msg) {
+</span></span><span style="display:flex;"><span>                    ByteBuf byteBuf <span style="color:#f92672">=</span> msg <span style="color:#66d9ef">instanceof</span> ByteBuf <span style="color:#f92672">?</span> ((ByteBuf) msg) : <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (byteBuf <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> buf <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>16<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>                        ByteBuf len <span style="color:#f92672">=</span> byteBuf.<span style="color:#a6e22e">readBytes</span>(buf, 0, byteBuf.<span style="color:#a6e22e">readableBytes</span>());
+</span></span><span style="display:flex;"><span>                        log.<span style="color:#a6e22e">debug</span>(<span style="color:#66d9ef">new</span> String(buf));
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }).<span style="color:#a6e22e">bind</span>(8080).<span style="color:#a6e22e">sync</span>();
+</span></span></code></pre></div><p>客户端代码不变，启动三次，分别修改发送字符串为 zhangsan（第一次），lisi（第二次），wangwu（第三次）</p>
+<p>输出</p>
+<pre tabindex="0"><code>22:19:48 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x251562d5, L:/127.0.0.1:8080 - R:/127.0.0.1:52588] REGISTERED
+22:19:48 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x251562d5, L:/127.0.0.1:8080 - R:/127.0.0.1:52588] ACTIVE
+22:19:48 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x251562d5, L:/127.0.0.1:8080 - R:/127.0.0.1:52588] READ: 8B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 7a 68 61 6e 67 73 61 6e                         |zhangsan        |
++--------+-------------------------------------------------+----------------+
+22:19:48 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x251562d5, L:/127.0.0.1:8080 - R:/127.0.0.1:52588] READ COMPLETE
+22:19:48 [DEBUG] [defaultEventLoopGroup-2-1] c.i.o.EventLoopTest - zhangsan        
+22:19:50 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x251562d5, L:/127.0.0.1:8080 - R:/127.0.0.1:52588] READ: 8B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 7a 68 61 6e 67 73 61 6e                         |zhangsan        |
++--------+-------------------------------------------------+----------------+
+22:19:50 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x251562d5, L:/127.0.0.1:8080 - R:/127.0.0.1:52588] READ COMPLETE
+22:19:50 [DEBUG] [defaultEventLoopGroup-2-1] c.i.o.EventLoopTest - zhangsan        
+22:20:24 [DEBUG] [nioEventLoopGroup-4-2] i.n.h.l.LoggingHandler - [id: 0x94b2a840, L:/127.0.0.1:8080 - R:/127.0.0.1:52612] REGISTERED
+22:20:24 [DEBUG] [nioEventLoopGroup-4-2] i.n.h.l.LoggingHandler - [id: 0x94b2a840, L:/127.0.0.1:8080 - R:/127.0.0.1:52612] ACTIVE
+22:20:25 [DEBUG] [nioEventLoopGroup-4-2] i.n.h.l.LoggingHandler - [id: 0x94b2a840, L:/127.0.0.1:8080 - R:/127.0.0.1:52612] READ: 4B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 6c 69 73 69                                     |lisi            |
++--------+-------------------------------------------------+----------------+
+22:20:25 [DEBUG] [nioEventLoopGroup-4-2] i.n.h.l.LoggingHandler - [id: 0x94b2a840, L:/127.0.0.1:8080 - R:/127.0.0.1:52612] READ COMPLETE
+22:20:25 [DEBUG] [defaultEventLoopGroup-2-2] c.i.o.EventLoopTest - lisi            
+22:20:27 [DEBUG] [nioEventLoopGroup-4-2] i.n.h.l.LoggingHandler - [id: 0x94b2a840, L:/127.0.0.1:8080 - R:/127.0.0.1:52612] READ: 4B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 6c 69 73 69                                     |lisi            |
++--------+-------------------------------------------------+----------------+
+22:20:27 [DEBUG] [nioEventLoopGroup-4-2] i.n.h.l.LoggingHandler - [id: 0x94b2a840, L:/127.0.0.1:8080 - R:/127.0.0.1:52612] READ COMPLETE
+22:20:27 [DEBUG] [defaultEventLoopGroup-2-2] c.i.o.EventLoopTest - lisi            
+22:20:38 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x79a26af9, L:/127.0.0.1:8080 - R:/127.0.0.1:52625] REGISTERED
+22:20:38 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x79a26af9, L:/127.0.0.1:8080 - R:/127.0.0.1:52625] ACTIVE
+22:20:38 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x79a26af9, L:/127.0.0.1:8080 - R:/127.0.0.1:52625] READ: 6B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 77 61 6e 67 77 75                               |wangwu          |
++--------+-------------------------------------------------+----------------+
+22:20:38 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x79a26af9, L:/127.0.0.1:8080 - R:/127.0.0.1:52625] READ COMPLETE
+22:20:38 [DEBUG] [defaultEventLoopGroup-2-1] c.i.o.EventLoopTest - wangwu          
+22:20:40 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x79a26af9, L:/127.0.0.1:8080 - R:/127.0.0.1:52625] READ: 6B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 77 61 6e 67 77 75                               |wangwu          |
++--------+-------------------------------------------------+----------------+
+22:20:40 [DEBUG] [nioEventLoopGroup-4-1] i.n.h.l.LoggingHandler - [id: 0x79a26af9, L:/127.0.0.1:8080 - R:/127.0.0.1:52625] READ COMPLETE
+22:20:40 [DEBUG] [defaultEventLoopGroup-2-1] c.i.o.EventLoopTest - wangwu          
+</code></pre><p>可以看到，nio 工人和 非 nio 工人也分别绑定了 channel（LoggingHandler 由 nio 工人执行，而我们自己的 handler 由非 nio 工人执行）</p>
+<p><img src="/images/blogs/image-20240527001920061.png" alt="image-20240527001920061"></p>
+<h2 id="为什么">为什么</h2>
+<ol>
+<li><strong>性能优化</strong>：通过将不同类型的任务分配到不同的线程组，可以减少单个线程或线程组的负载，避免复杂的业务逻辑影响到主I/O处理的性能，特别是在高负载环境下。</li>
+<li><strong>任务专用化</strong>：<code>DefaultEventLoopGroup</code>通常被用作第三种类型的EventLoopGroup，除了常规的<code>boss</code>和<code>worker</code>，它可以被用于处理非I/O任务或特定的业务逻辑，从而避免干扰正常的I/O处理线程。在这个示例中，<code>handler2</code>使用了这个独立的<code>DefaultEventLoopGroup</code>来处理业务逻辑，可能是日志记录、数据处理等非直接I/O任务。</li>
+</ol>
+<p>在Netty中使用<code>DefaultEventLoopGroup</code>为特定的<code>ChannelHandler</code>（如在您的例子中的<code>handler2</code>）提供单独的事件循环组时，可以实现异步处理，从而提高整体的I/O效率。</p>
+<p>这是如何工作的：</p>
+<ol>
+<li><strong>任务分配</strong>：当一个客户端连接建立时，连接的<code>Channel</code>被初始化并分配给<code>worker</code>线程组中的某个<code>EventLoop</code>。这个<code>EventLoop</code>负责处理所有来自该连接的I/O事件，如数据的读取和初步处理。</li>
+<li><strong>异步处理</strong>：如果您为<code>handler2</code>指定了一个独立的<code>DefaultEventLoopGroup</code>，当<code>handler1</code>处理完消息并调用<code>ctx.fireChannelRead(msg)</code>后，消息将被传递给<code>handler2</code>。但是，与<code>handler1</code>在相同的<code>EventLoop</code>中同步运行不同，<code>handler2</code>将在<code>DefaultEventLoopGroup</code>中的某个独立的<code>EventLoop</code>上异步执行。</li>
+<li><strong>释放原始<code>EventLoop</code></strong>：这种分离使得<code>worker</code>的<code>EventLoop</code>可以快速处理完与接收和初步处理消息相关的任务，然后立即回到准备处理新的I/O事件的状态。因此，该<code>EventLoop</code>不需要等待<code>handler2</code>的处理逻辑完成，这可能涉及更复杂或耗时的操作。</li>
+<li><strong>提升I/O效率</strong>：这样做的直接效益是提高了I/O效率，因为原始的<code>EventLoop</code>不会被长时间的业务逻辑处理阻塞，从而可以继续接受和处理来自其他客户端的新连接或数据。</li>
+</ol>
+<p>通过这种方式，您可以更有效地利用系统的线程资源，确保网络I/O操作的高响应性和高吞吐量，同时还能处理复杂的业务逻辑，从而使得整体应用架构更加健壮和可扩展。这是Netty框架设计的重要优势之一，允许开发者根据具体的应用需求灵活地管理不同类型的任务。</p>
+<blockquote>
+<p>问题：这个worker的EventLoop和channel绑定的吗？这个channel上的操作没结束，为什么他可以去做别的？</p>
+</blockquote>
+<p>在Netty中，每个<code>Channel</code>一旦被注册到某个<code>EventLoop</code>，确实会与该<code>EventLoop</code>绑定，并且在该<code>EventLoop</code>的生命周期内保持绑定。这意味着同一个<code>Channel</code>的所有I/O操作都是由同一个<code>EventLoop</code>单线程处理，以保证操作的线程安全和顺序性。</p>
+<p>然而，尽管每个<code>Channel</code>与一个<code>EventLoop</code>绑定，这并不意味着该<code>EventLoop</code>不能处理其他<code>Channel</code>的事件。一个<code>EventLoop</code>可以同时管理多个<code>Channel</code>。这是通过事件循环机制实现的，<code>EventLoop</code>会轮询它管理的所有<code>Channel</code>的事件队列，并处理这些事件。这种设计允许<code>EventLoop</code>在等待一个<code>Channel</code>的I/O操作完成时，转而处理其他<code>Channel</code>的事件，从而提高资源的利用率。</p>
+<h2 id="切换操作是如何实现">切换操作是如何实现</h2>
+<p>关键代码 <code>io.netty.channel.AbstractChannelHandlerContext#invokeChannelRead()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">invokeChannelRead</span>(<span style="color:#66d9ef">final</span> AbstractChannelHandlerContext next, Object msg) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">final</span> Object m <span style="color:#f92672">=</span> next.<span style="color:#a6e22e">pipeline</span>.<span style="color:#a6e22e">touch</span>(ObjectUtil.<span style="color:#a6e22e">checkNotNull</span>(msg, <span style="color:#e6db74">&#34;msg&#34;</span>), next);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 下一个 handler 的事件循环是否与当前的事件循环是同一个线程</span>
+</span></span><span style="display:flex;"><span>    EventExecutor executor <span style="color:#f92672">=</span> next.<span style="color:#a6e22e">executor</span>();
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 是，直接调用</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (executor.<span style="color:#a6e22e">inEventLoop</span>()) {
+</span></span><span style="display:flex;"><span>        next.<span style="color:#a6e22e">invokeChannelRead</span>(m);
+</span></span><span style="display:flex;"><span>    } 
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 不是，将要执行的代码作为任务提交给下一个事件循环处理（换人）</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        executor.<span style="color:#a6e22e">execute</span>(<span style="color:#66d9ef">new</span> Runnable() {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">run</span>() {
+</span></span><span style="display:flex;"><span>                next.<span style="color:#a6e22e">invokeChannelRead</span>(m);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>如果两个 handler 绑定的是同一个线程，那么就直接调用</li>
+<li>否则，把要调用的代码封装为一个任务对象，由下一个 handler 的线程来调用</li>
+</ul>
+<p>NioEventLoop 除了可以处理 io 事件，同样可以向它提交普通任务</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>NioEventLoopGroup nioWorkers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> NioEventLoopGroup(2);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>log.<span style="color:#a6e22e">debug</span>(<span style="color:#e6db74">&#34;server start...&#34;</span>);
+</span></span><span style="display:flex;"><span>Thread.<span style="color:#a6e22e">sleep</span>(2000);
+</span></span><span style="display:flex;"><span>nioWorkers.<span style="color:#a6e22e">execute</span>(()<span style="color:#f92672">-&gt;</span>{
+</span></span><span style="display:flex;"><span>    log.<span style="color:#a6e22e">debug</span>(<span style="color:#e6db74">&#34;normal task...&#34;</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>输出</p>
+<pre tabindex="0"><code>22:30:36 [DEBUG] [main] c.i.o.EventLoopTest2 - server start...
+22:30:38 [DEBUG] [nioEventLoopGroup-2-1] c.i.o.EventLoopTest2 - normal task...
+</code></pre><blockquote>
+<p>可以用来执行耗时较长的任务</p>
+</blockquote>
+<p>参考：B站黑马Netty, netty.io文档</p>
+
+          </article>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-3">
+        <div id="stickySideBar" class="sticky-sidebar">
+          
+          <aside class="toc">
+              <h5>
+                Table Of Contents
+              </h5>
+              <div class="toc-content">
+                <nav id="TableOfContents">
+  <ul>
+    <li><a href="#介绍">介绍</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#为什么">为什么</a></li>
+    <li><a href="#切换操作是如何实现">切换操作是如何实现</a></li>
+  </ul>
+</nav>
+              </div>
+          </aside>
+          
+
+          
+          <aside class="tags">
+            <h5>Tags</h5>
+            <ul class="tags-ul list-unstyled list-inline">
+              
+              <li class="list-inline-item"><a href="http://localhost:1313/tags/netty" target="_blank">Netty</a></li>
+              
+              <li class="list-inline-item"><a href="http://localhost:1313/tags/backend-development" target="_blank">Backend Development</a></li>
+              
+            </ul>
+          </aside>
+          
+
+          
+          <aside class="social">
+            <h5>Social</h5>
+            <div class="social-content">
+              <ul class="list-inline">
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href="https://www.linkedin.com/shareArticle?mini=true&url=http%3a%2f%2flocalhost%3a1313%2fblogs%2fnetty-eventloop%2f">
+                    <i class="fab fa-linkedin"></i>
+                  </a>
+                </li>
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href="https://twitter.com/share?text=Netty%20%e7%9a%84%20EventLoop%20%e7%bc%96%e6%8e%92&url=http%3a%2f%2flocalhost%3a1313%2fblogs%2fnetty-eventloop%2f">
+                    <i class="fab fa-twitter"></i>
+                  </a>
+                </li>
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href="https://api.whatsapp.com/send?text=Netty%20%e7%9a%84%20EventLoop%20%e7%bc%96%e6%8e%92: http%3a%2f%2flocalhost%3a1313%2fblogs%2fnetty-eventloop%2f">
+                    <i class="fab fa-whatsapp"></i>
+                  </a>
+                </li>
+                <li class="list-inline-item text-center">
+                  <a target="_blank" href='mailto:?subject=Netty%20%e7%9a%84%20EventLoop%20%e7%bc%96%e6%8e%92&amp;body=Check%20out%20this%20site http%3a%2f%2flocalhost%3a1313%2fblogs%2fnetty-eventloop%2f'>
+                    <i class="fa fa-envelope"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </aside>
+          
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-9 p-4">
+        
+      </div>
+    </div>
+  </div>
+  <button class="p-2 px-3" onclick="topFunction()" id="topScroll">
+    <i class="fas fa-angle-up"></i>
+  </button>
+</section>
+
+
+<div class="progress">
+  <div id="scroll-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+<Script src="/js/scrollProgressBar.js"></script>
+
+
+<script>
+  var topScroll = document.getElementById("topScroll");
+  window.onscroll = function() {scrollFunction()};
+
+  function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+      topScroll.style.display = "block";
+    } else {
+      topScroll.style.display = "none";
+    }
+  }
+
+  function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }
+
+  
+  let stickySideBarElem = document.getElementById("stickySideBar");
+  let stickyNavBar =  true ;
+  if(stickyNavBar) {
+    let headerElem = document.getElementById("profileHeader");
+    let headerHeight = headerElem.offsetHeight + 15;
+    stickySideBarElem.style.top = headerHeight + "px";
+  } else {
+    stickySideBarElem.style.top = "50px";
+  }
+</script>
+
+
+<script src="/js/readingTime.js"></script>
+
+
+
+  </div><footer>
+    
+ 
+ 
+<div class="container py-3" id="recent-posts">
+    
+    
+    <div class="h3 text-center text-secondary py-3">
+        Recent Posts
+    </div>
+    <div class="row justify-content-center">
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-header">
+                    <a href="/blogs/netty-eventloop/">
+                        <img src="/images/blogs/nettty.png" class="card-img-top" alt="Netty 的 EventLoop 编排">
+                    </a>
+                </div>
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/blogs/netty-eventloop/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="Netty 的 EventLoop 编排">Netty 的 EventLoop 编排</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p>介绍 EventLoop：事件循环对象，可以理解为在 netty 中处理数据的工人
+EventLoop 本质是一个单线程执行器（同时维护了一个 Selector），里面有 run …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">May 29, 2024</span>
+                    <a href="/blogs/netty-eventloop/" class="float-end btn btn-outline-info btn-sm">Read</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-header">
+                    <a href="/blogs/math/">
+                        <img src="/images/mathjax.png" class="card-img-top" alt="Render Math With Mathjax">
+                    </a>
+                </div>
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/blogs/math/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="Render Math With Mathjax">Render Math With Mathjax</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p>Mathjax Math equations can be rendered using Mathjax syntax with AMS symbol support.
+Optionally …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">Dec 9, 2022</span>
+                    <a href="/blogs/math/" class="float-end btn btn-outline-info btn-sm">Read</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 pt-2">
+            <div class="card h-100">
+                
+                <div class="card-header">
+                    <a href="/blogs/markdown-syntax/">
+                        <img src="/images/post.jpg" class="card-img-top" alt="Markdown Syntax">
+                    </a>
+                </div>
+                
+                <div class="card-body bg-transparent p-3 shadow-sm">
+                    <a href="/blogs/markdown-syntax/" class="primary-font card-title">
+                        <h5 class="card-title bg-transparent" title="Markdown Syntax">Markdown Syntax</h5>
+                    </a>
+                    <div class="card-text secondary-font">
+                        <p>Paragraph Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur …</p>
+                    </div>
+                </div>
+                <div class="mt-auto card-footer">
+                    <span class="float-start">Apr 3, 2021</span>
+                    <a href="/blogs/markdown-syntax/" class="float-end btn btn-outline-info btn-sm">Read</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="text-center pt-2">
+    
+    <span class="px-1">
+        <a href="https://github.com/principlezheng" aria-label="github">
+            <svg xmlns="http://www.w3.org/2000/svg" width="2.7em" height="2.7em" viewBox="0 0 1792 1792">
+                <path
+                    d="M522 1352q-8 9-20-3-13-11-4-19 8-9 20 3 12 11 4 19zm-42-61q9 12 0 19-8 6-17-7t0-18q9-7 17 6zm-61-60q-5 7-13 2-10-5-7-12 3-5 13-2 10 5 7 12zm31 34q-6 7-16-3-9-11-2-16 6-6 16 3 9 11 2 16zm129 112q-4 12-19 6-17-4-13-15t19-7q16 5 13 16zm63 5q0 11-16 11-17 2-17-11 0-11 16-11 17-2 17 11zm58-10q2 10-14 14t-18-8 14-15q16-2 18 9zm964-956v960q0 119-84.5 203.5t-203.5 84.5h-224q-16 0-24.5-1t-19.5-5-16-14.5-5-27.5v-239q0-97-52-142 57-6 102.5-18t94-39 81-66.5 53-105 20.5-150.5q0-121-79-206 37-91-8-204-28-9-81 11t-92 44l-38 24q-93-26-192-26t-192 26q-16-11-42.5-27t-83.5-38.5-86-13.5q-44 113-7 204-79 85-79 206 0 85 20.5 150t52.5 105 80.5 67 94 39 102.5 18q-40 36-49 103-21 10-45 15t-57 5-65.5-21.5-55.5-62.5q-19-32-48.5-52t-49.5-24l-20-3q-21 0-29 4.5t-5 11.5 9 14 13 12l7 5q22 10 43.5 38t31.5 51l10 23q13 38 44 61.5t67 30 69.5 7 55.5-3.5l23-4q0 38 .5 103t.5 68q0 22-11 33.5t-22 13-33 1.5h-224q-119 0-203.5-84.5t-84.5-203.5v-960q0-119 84.5-203.5t203.5-84.5h960q119 0 203.5 84.5t84.5 203.5z" />
+
+                <metadata>
+                    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+                        <rdf:Description about="https://iconscout.com/legal#licenses"
+                            dc:title="Github, Online, Project, Hosting, Square"
+                            dc:description="Github, Online, Project, Hosting, Square" dc:publisher="Iconscout"
+                            dc:date="2016-12-14" dc:format="image/svg+xml" dc:language="en">
+                            <dc:creator>
+                                <rdf:Bag>
+                                    <rdf:li>Font Awesome</rdf:li>
+                                </rdf:Bag>
+                            </dc:creator>
+                        </rdf:Description>
+                    </rdf:RDF>
+                </metadata>
+            </svg>
+        </a>
+    </span>
+    
+
+    
+    <span class="px-1">
+        <a href="https://linkedin.com/in/yuanze" aria-label="linkedin">
+            <svg xmlns="http://www.w3.org/2000/svg" width='2.4em' height='2.4em' fill="#fff" aria-label="LinkedIn"
+                viewBox="0 0 512 512">
+                <rect width="512" height="512" fill="#0077b5" rx="15%" />
+                <circle cx="142" cy="138" r="37" />
+                <path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198" />
+                <path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32" />
+            </svg>
+        </a>
+    </span>
+    
+
+    
+    <a href="https://twitter.com" aria-label="twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
+            <path fill="#03a9f4"
+                d="M42,37c0,2.762-2.239,5-5,5H11c-2.762,0-5-2.238-5-5V11c0-2.762,2.238-5,5-5h26c2.761,0,5,2.238,5,5 V37z" />
+            <path fill="#fff"
+                d="M36,17.12c-0.882,0.391-1.999,0.758-3,0.88c1.018-0.604,2.633-1.862,3-3 c-0.951,0.559-2.671,1.156-3.793,1.372C31.311,15.422,30.033,15,28.617,15C25.897,15,24,17.305,24,20v2c-4,0-7.9-3.047-10.327-6 c-0.427,0.721-0.667,1.565-0.667,2.457c0,1.819,1.671,3.665,2.994,4.543c-0.807-0.025-2.335-0.641-3-1c0,0.016,0,0.036,0,0.057 c0,2.367,1.661,3.974,3.912,4.422C16.501,26.592,16,27,14.072,27c0.626,1.935,3.773,2.958,5.928,3c-1.686,1.307-4.692,2-7,2 c-0.399,0-0.615,0.022-1-0.023C14.178,33.357,17.22,34,20,34c9.057,0,14-6.918,14-13.37c0-0.212-0.007-0.922-0.018-1.13 C34.95,18.818,35.342,18.104,36,17.12" />
+        </svg>
+    </a>
+    
+
+    
+    <a href="https://instagram.com" aria-label="instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
+            <radialGradient id="yOrnnhliCrdS2gy~4tD8ma" cx="19.38" cy="42.035" r="44.899"
+                gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#fd5" />
+                <stop offset=".328" stop-color="#ff543f" />
+                <stop offset=".348" stop-color="#fc5245" />
+                <stop offset=".504" stop-color="#e64771" />
+                <stop offset=".643" stop-color="#d53e91" />
+                <stop offset=".761" stop-color="#cc39a4" />
+                <stop offset=".841" stop-color="#c837ab" />
+            </radialGradient>
+            <path fill="url(#yOrnnhliCrdS2gy~4tD8ma)"
+                d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20	c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20	C42.014,38.383,38.417,41.986,34.017,41.99z" />
+            <radialGradient id="yOrnnhliCrdS2gy~4tD8mb" cx="11.786" cy="5.54" r="29.813"
+                gradientTransform="matrix(1 0 0 .6663 0 1.849)" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#4168c9" />
+                <stop offset=".999" stop-color="#4168c9" stop-opacity="0" />
+            </radialGradient>
+            <path fill="url(#yOrnnhliCrdS2gy~4tD8mb)"
+                d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20	c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20	C42.014,38.383,38.417,41.986,34.017,41.99z" />
+            <path fill="#fff"
+                d="M24,31c-3.859,0-7-3.14-7-7s3.141-7,7-7s7,3.14,7,7S27.859,31,24,31z M24,19c-2.757,0-5,2.243-5,5	s2.243,5,5,5s5-2.243,5-5S26.757,19,24,19z" />
+            <circle cx="31.5" cy="16.5" r="1.5" fill="#fff" />
+            <path fill="#fff"
+                d="M30,37H18c-3.859,0-7-3.14-7-7V18c0-3.86,3.141-7,7-7h12c3.859,0,7,3.14,7,7v12	C37,33.86,33.859,37,30,37z M18,13c-2.757,0-5,2.243-5,5v12c0,2.757,2.243,5,5,5h12c2.757,0,5-2.243,5-5V18c0-2.757-2.243-5-5-5H18z" />
+        </svg>
+    </a>
+    
+
+    
+    <a href="https://facebook.com" aria-label="facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
+            <path fill="#3F51B5"
+                d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z" />
+            <path fill="#FFF"
+                d="M34.368,25H31v13h-5V25h-3v-4h3v-2.41c0.002-3.508,1.459-5.59,5.592-5.59H35v4h-2.287C31.104,17,31,17.6,31,18.723V21h4L34.368,25z" />
+        </svg>
+    </a>
+    
+</div><div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-4 text-center">
+            <div class="pb-2">
+                <a href="http://localhost:1313/" title="Evan&#39;s Site">
+                    <img alt="Footer logo" src="/snowflake.png"
+                        height="40px" width="40px">
+                </a>
+            </div>
+            &copy; 2024  All rights reserved
+            <div class="text-secondary">
+                Made with
+                <span class="text-danger">
+                    &#10084;
+                </span>
+                and
+                <a href="https://github.com/gurusabarish/hugo-profile" target="_blank"
+                    title="Designed and developed by gurusabarish">
+                    Hugo Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div></footer><script src="/bootstrap-5/js/bootstrap.bundle.min.js"></script>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  <section id="search-content" class="py-2">
+    <div class="container" id="search-results"></div>
+  </section>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Netty on Evan&#39;s Site</title>
+    <link>http://localhost:1313/tags/netty/</link>
+    <description>Recent content in Netty on Evan&#39;s Site</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 29 May 2024 19:53:33 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/netty/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Netty 的 EventLoop 编排</title>
+      <link>http://localhost:1313/blogs/netty-eventloop/</link>
+      <pubDate>Wed, 29 May 2024 19:53:33 +0530</pubDate>
+      <guid>http://localhost:1313/blogs/netty-eventloop/</guid>
+      <description>介绍 EventLoop：事件循环对象，可以理解为在 netty 中处理数据的工人&#xA;EventLoop 本质是一个单线程执行器（同时维护了一个 Selector），里面有 run 方法处理 Channel 上源源不断的 io 事件。&#xA;它的继承关系比较复杂&#xA;一条线是继承自 j.u.c.ScheduledExecutorService 因此包含了线程池中所有的方法 另一条线是继承自 netty 自己的 OrderedEventExecutor， 提供了 boolean inEventLoop(Thread thread) 方法判断一个线程是否属于此 EventLoop 提供了 parent 方法来看看自己属于哪个 EventLoopGroup 事件循环组&#xA;EventLoopGroup 是一组 EventLoop，Channel 一般会调用 EventLoopGroup 的 register 方法来绑定其中一个 EventLoop，后续这个 Channel 上的 io 事件都由此 EventLoop 来处理（保证了 io 事件处理时的线程安全）&#xA;继承自 netty 自己的 EventExecutorGroup 实现了 Iterable 接口提供遍历 EventLoop 的能力 另有 next 方法获取集合中下一个 EventLoop 以一个简单的实现为例：&#xA;// 内部创建了两个 EventLoop, 每个 EventLoop 维护一个线程 DefaultEventLoopGroup group = new DefaultEventLoopGroup(2); System.</description>
+    </item>
+  </channel>
+</rss>
