@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bit Manipulation on Evan&#39;s Site</title>
+    <link>https://principlezheng.github.io/tags/bit-manipulation/</link>
+    <description>Recent content in Bit Manipulation on Evan&#39;s Site</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 31 May 2024 19:53:33 +0530</lastBuildDate>
+    <atom:link href="https://principlezheng.github.io/tags/bit-manipulation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bit Manipulation LeetCode Problems</title>
+      <link>https://principlezheng.github.io/blogs/bit-manipulation-leetcode/</link>
+      <pubDate>Fri, 31 May 2024 19:53:33 +0530</pubDate>
+      <guid>https://principlezheng.github.io/blogs/bit-manipulation-leetcode/</guid>
+      <description>Problem 1 136. Single Number&#xA;Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.&#xA;You must implement a solution with a linear runtime complexity and use only constant extra space.&#xA;Simply utilize the XOR operator&amp;rsquo;s feature: a ^ a = 0 to remove all the elements that have appeared twice:&#xA;class Solution { public int singleNumber(int[] nums) { int res = 0; for (int n : nums) { res ^= n; } return res; } } Problem 2 137.</description>
+    </item>
+  </channel>
+</rss>
