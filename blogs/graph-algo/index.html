@@ -383,10 +383,10 @@ class Solution { public int minCostToSupplyWater(int n, int[] wells, int[][] pip
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>复杂度分析：</p>
-<p>时间复杂度: $$O((N+M)⋅log⁡(N+M))$$</p>
-<p>构建图，我们迭代了输入的房屋和管道，这需要 $$O(N + M)$$ 的时间。
-当构建 MST 时，在最坏的情况下，我们可能需要迭代图中的所有边，总数为 $$N + M$$ 。 对于每个边，它最多进入和退出堆数据结构一次。把边放入堆中 (push 操作) 需要 $$log(N+M)$$ 的时间，而退出边 ( pop 操作) 需要一个常数时间。 因此，MST 构建过程的时间复杂度是 $$O((N+M)⋅log⁡(N+M))$$。
-总的来说，算法的总体时间复杂度是 $$O((N+M)⋅log⁡(N+M))$$。</p>
+<p>时间复杂度: \(O((N+M)⋅log⁡(N+M))\)</p>
+<p>构建图，我们迭代了输入的房屋和管道，这需要 \(O(N + M)\( 的时间。
+当构建 MST 时，在最坏的情况下，我们可能需要迭代图中的所有边，总数为 \(N + M\) 。 对于每个边，它最多进入和退出堆数据结构一次。把边放入堆中 (push 操作) 需要 \(log(N+M)\) 的时间，而退出边 ( pop 操作) 需要一个常数时间。 因此，MST 构建过程的时间复杂度是 \(O((N+M)⋅log⁡(N+M))\)。
+总的来说，算法的总体时间复杂度是 \(O((N+M)⋅log⁡(N+M))\)。</p>
 <p>参考：力扣（LeetCode）</p>
 <h2 id="kruskal算法">Kruskal算法</h2>
 <p>Kruskal算法是一种用于在加权图中找到最小生成树（Minimum Spanning Tree, MST）的算法。它适用于边的权重各不相同的连通图。Kruskal算法是基于贪心策略实现的，其主要思想是按照边的权重顺序（从小到大）处理每条边，并在不形成环的前提下逐步添加到最小生成树中。</p>
@@ -400,8 +400,8 @@ class Solution { public int minCostToSupplyWater(int n, int[] wells, int[][] pip
 <li>如果会形成环，则丢弃这条边，不将其加入最小生成树。</li>
 </ul>
 </li>
-<li><strong>重复选择过程</strong>： 重复第3步，直到添加了 V−1V-1V−1 条边到最小生成树中，其中 VVV 是图中顶点的数量。在连通图中，最小生成树恰好包含 V−1V-1V−1 条边。</li>
-<li><strong>完成构建</strong>： 当添加了足够的边（V−1V-1V−1 条）后，算法完成，此时构建的就是整个图的最小生成树。</li>
+<li><strong>重复选择过程</strong>： 重复第3步，直到添加了 V−1 条边到最小生成树中，其中 V 是图中顶点的数量。在连通图中，最小生成树恰好包含 V−1V-1V−1 条边。</li>
+<li><strong>完成构建</strong>： 当添加了足够的边（V-1 条）后，算法完成，此时构建的就是整个图的最小生成树。</li>
 </ol>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> MAX_N <span style="color:#f92672">=</span> 10005;
