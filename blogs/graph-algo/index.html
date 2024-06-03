@@ -337,10 +337,10 @@ class Solution { public int minCostToSupplyWater(int n, int[] wells, int[][] pip
 请返回 为所有房子都供水的最低总成本。</p>
 <p>Prim 算法 在<strong>加权</strong>和<strong>无向</strong>图中找到最小生成树
 从一个任意顶点开始，Prim 算法通过每次添加一个顶点到树中增长最小生成树。 顶点的选择基于<strong>贪婪</strong>策略，即添加新的顶点会产生最小的成本。</p>
-<p><img src="/Users/zhengyuanze/Developer/myBlog/NoteBook/evan-blog/static/images/blogs/image-20240603121425557.png" alt="image-20240603121425557"></p>
+<p><img src="/images/blogs/image-20240603121425557.png" alt="image-20240603121425557"></p>
 <p>本题与建立最小生成树的差别：房子可以自己打水井。</p>
 <p>通过添加节点0为虚拟水井，可以将房子自己打水井转换成和节点0之间建立连边：</p>
-<p><img src="/Users/zhengyuanze/Developer/myBlog/NoteBook/evan-blog/static/images/blogs/image-20240603121910886.png" alt="image-20240603121910886"></p>
+<p><img src="/images/blogs/image-20240603121910886.png" alt="image-20240603121910886"></p>
 <p>需要用到：<strong>PriorityQueue 最小堆</strong>， <strong>List&lt;List&lt;Pair&lt;Integer, Integer&raquo;&gt; 邻接表</strong>表示图， <strong>HashSet</strong>记录已加入生成树的节点。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">minCostToSupplyWater</span>(<span style="color:#66d9ef">int</span> n, <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> wells, <span style="color:#66d9ef">int</span><span style="color:#f92672">[][]</span> pipes) {
