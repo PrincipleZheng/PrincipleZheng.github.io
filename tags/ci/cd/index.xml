@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CI/CD on Evan&#39;s Site</title>
+    <link>https://principlezheng.github.io/tags/ci/cd/</link>
+    <description>Recent content in CI/CD on Evan&#39;s Site</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 13 Jun 2024 23:25:33 +0530</lastBuildDate>
+    <atom:link href="https://principlezheng.github.io/tags/ci/cd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Navigating CI/CD Hurdles: A Goimports Issue During PR Submission</title>
+      <link>https://principlezheng.github.io/blogs/a-goimports-issue/</link>
+      <pubDate>Thu, 13 Jun 2024 23:25:33 +0530</pubDate>
+      <guid>https://principlezheng.github.io/blogs/a-goimports-issue/</guid>
+      <description>Recently, while working on a PR for a project, I encountered an issue that caused our GitHub CI/CD checks to fail.&#xA;During the development, after submitting the PR, the CI/CD pipeline flagged an error, hindering the progress of my PR. The message displayed was:&#xA;&amp;ldquo;File is not goimports-ed with -local xxx.&amp;rdquo;&#xA;I ran make lint locally and faced the following error message:&#xA;&amp;ldquo;internal/http/handler/v1beta2/stream_test.go:3: File is not goimports-ed with -local neutron (goimports)&amp;rdquo;</description>
+    </item>
+  </channel>
+</rss>

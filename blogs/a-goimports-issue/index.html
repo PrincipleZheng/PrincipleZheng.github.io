@@ -31,33 +31,30 @@
   
 
 
-<meta property="og:url" content="https://principlezheng.github.io/blogs/math/">
+<meta property="og:url" content="https://principlezheng.github.io/blogs/a-goimports-issue/">
   <meta property="og:site_name" content="Evan&#39;s Site">
-  <meta property="og:title" content="Render Math With Mathjax">
-  <meta property="og:description" content="Mathjax Math equations can be rendered using Mathjax syntax with AMS symbol support.
-Optionally enable this on a per-page basis by adding mathjax: true to your frontmatter.
-Then, use $$ ... $$ on a line by itself to render a block equation:
-$$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &lt; \text{negligible} $$
-The raw version is:
-$$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &lt; \text{negligible} $$ Write in-line equations with \\( .">
+  <meta property="og:title" content="Navigating CI/CD Hurdles: A Goimports Issue During PR Submission">
+  <meta property="og:description" content="Recently, while working on a PR for a project, I encountered an issue that caused our GitHub CI/CD checks to fail.
+During the development, after submitting the PR, the CI/CD pipeline flagged an error, hindering the progress of my PR. The message displayed was:
+“File is not goimports-ed with -local xxx.”
+I ran make lint locally and faced the following error message:
+“internal/http/handler/v1beta2/stream_test.go:3: File is not goimports-ed with -local neutron (goimports)”">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blogs">
-    <meta property="article:published_time" content="2022-12-09T19:53:33+05:30">
-    <meta property="article:modified_time" content="2022-12-09T19:53:33+05:30">
-    <meta property="article:tag" content="Markdown Syntax">
-    <meta property="article:tag" content="Mathjax">
-    <meta property="article:tag" content="Example">
+    <meta property="article:published_time" content="2024-06-13T23:25:33+05:30">
+    <meta property="article:modified_time" content="2024-06-13T23:25:33+05:30">
+    <meta property="article:tag" content="Go">
+    <meta property="article:tag" content="CI/CD">
 
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Render Math With Mathjax">
-  <meta name="twitter:description" content="Mathjax Math equations can be rendered using Mathjax syntax with AMS symbol support.
-Optionally enable this on a per-page basis by adding mathjax: true to your frontmatter.
-Then, use $$ ... $$ on a line by itself to render a block equation:
-$$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &lt; \text{negligible} $$
-The raw version is:
-$$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &lt; \text{negligible} $$ Write in-line equations with \\( .">
+  <meta name="twitter:title" content="Navigating CI/CD Hurdles: A Goimports Issue During PR Submission">
+  <meta name="twitter:description" content="Recently, while working on a PR for a project, I encountered an issue that caused our GitHub CI/CD checks to fail.
+During the development, after submitting the PR, the CI/CD pipeline flagged an error, hindering the progress of my PR. The message displayed was:
+“File is not goimports-ed with -local xxx.”
+I ran make lint locally and faced the following error message:
+“internal/http/handler/v1beta2/stream_test.go:3: File is not goimports-ed with -local neutron (goimports)”">
 
 
 <link rel="stylesheet" href="/bootstrap-5/css/bootstrap.min.css" media="all"><link rel="stylesheet" href="/css/header.css" media="all">
@@ -128,7 +125,7 @@ $$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &
 <script defer src="/fontawesome-6/all-6.4.2.js"></script>
 
   <title>
-Render Math With Mathjax | Evan&#39;s Site
+Navigating CI/CD Hurdles: A Goimports Issue During PR Submission | Evan&#39;s Site
 
   </title>
 </head>
@@ -294,11 +291,11 @@ Render Math With Mathjax | Evan&#39;s Site
       <div class="col-sm-12 col-md-12 col-lg-9">
         <div class="pr-lg-4">
           <div class="title mb-5">
-            <h1 class="text-center mb-4">Render Math With Mathjax</h1>
+            <h1 class="text-center mb-4">Navigating CI/CD Hurdles: A Goimports Issue During PR Submission</h1>
             <div class="text-center">
-              Gurusabarish 
+              Evan Zheng 
               <small>|</small>
-              Dec 9, 2022
+              Jun 13, 2024
 
               
               <span id="readingTime">
@@ -309,20 +306,44 @@ Render Math With Mathjax | Evan&#39;s Site
           </div>
           
           <div class="featured-image">
-            <img class="img-fluid mx-auto d-block" src="/images/mathjax.png" alt="Render Math With Mathjax">
+            <img class="img-fluid mx-auto d-block" src="/images/blogs/goland.png" alt="Navigating CI/CD Hurdles: A Goimports Issue During PR Submission">
           </div>
           
           <article class="page-content  p-2">
-          <h2 id="mathjax">Mathjax</h2>
-<p>Math equations can be rendered using <a href="https://www.mathjax.org">Mathjax</a> syntax with AMS symbol support.</p>
-<p>Optionally enable this on a per-page basis by adding <code>mathjax: true</code> to your frontmatter.</p>
-<p>Then, use <code>$$ ... $$</code> on a line by itself to render a block equation:</p>
-<p>$$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &lt; \text{negligible} $$</p>
-<p>The raw version is:</p>
-<pre tabindex="0"><code>$$ | Pr_{x \leftarrow P_{1}} [A(x) = 1] - Pr_{x \leftarrow P_{2}} [A(x) = 1] | &lt; \text{negligible} $$
-</code></pre><p>Write in-line equations with <code>\\( ... \\)</code> , like \( x^n / y \) . It&rsquo;s easy!</p>
-<pre tabindex="0"><code>Write in-line equations with `\\( ... \\)` , like \\( x^n / y \\) . It&#39;s easy!
-</code></pre>
+          <p>Recently, while working on a PR for a project, I encountered an issue that caused our GitHub CI/CD checks to fail.</p>
+<p>During the development, after submitting the PR, the CI/CD pipeline flagged an error, hindering the progress of my PR. The message displayed was:</p>
+<blockquote>
+<p>&ldquo;File is not goimports-ed with -local xxx.&rdquo;</p>
+</blockquote>
+<p>I ran <code>make lint</code> locally and faced the following error message:</p>
+<blockquote>
+<p>&ldquo;internal/http/handler/v1beta2/stream_test.go:3: File is not goimports-ed with -local neutron (goimports)&rdquo;</p>
+</blockquote>
+<p>This indicated an issue with the order of imports in my Go file, which did not meet the standards set by our project&rsquo;s static code analysis tool, golangci-lint.</p>
+<h2 id="understanding-the-configuration">Understanding the Configuration</h2>
+<p>Upon investigating the .golangci.yml configuration file, I noticed that goimports linter was enabled, which was responsible for enforcing import order. Here’s the crucial part of the configuration:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">run</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">go</span>: <span style="color:#e6db74">&#39;1.20&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">linters</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">enable</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">gofmt</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">goimports</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">disable</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">typecheck</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">linters-settings</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">goimports</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">local-prefixes</span>: <span style="color:#ae81ff">neutron</span>
+</span></span></code></pre></div><p>The local-prefixes directive was particularly important. It specifies that any imports starting with &ldquo;neutron&rdquo; are considered local and must be placed after third-party packages, adhering to the goimports rules.</p>
+<p>The Fix
+To resolve the issue, I had two main options:</p>
+<p><strong>1.Manually Running goimports:</strong></p>
+<p>I executed the following command in the terminal:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>goimports -w -local neutron <span style="color:#66d9ef">$(</span>find . -type f -name <span style="color:#e6db74">&#39;*.go&#39;</span><span style="color:#66d9ef">)</span>
+</span></span></code></pre></div><p>This command adjusts the import order in all Go files across the project, ensuring compliance with our golangci-lint settings.</p>
+<p><strong>2.Configuring IDE to Automatically Run goimports:</strong></p>
+<p>Alternatively, configuring the IDE to automatically apply goimports upon saving a file can prevent such issues from reoccurring. This ensures that every file is formatted correctly, reducing the chances of CI/CD failures related to code style.</p>
+<p><img src="/images/blogs/goland.png" alt="goland.png"></p>
+
           </article>
         </div>
       </div>
@@ -336,7 +357,7 @@ Render Math With Mathjax | Evan&#39;s Site
               <div class="toc-content">
                 <nav id="TableOfContents">
   <ul>
-    <li><a href="#mathjax">Mathjax</a></li>
+    <li><a href="#understanding-the-configuration">Understanding the Configuration</a></li>
   </ul>
 </nav>
               </div>
@@ -348,11 +369,9 @@ Render Math With Mathjax | Evan&#39;s Site
             <h5>Tags</h5>
             <ul class="tags-ul list-unstyled list-inline">
               
-              <li class="list-inline-item"><a href="https://principlezheng.github.io/tags/markdown-syntax" target="_blank">Markdown syntax</a></li>
+              <li class="list-inline-item"><a href="https://principlezheng.github.io/tags/go" target="_blank">Go</a></li>
               
-              <li class="list-inline-item"><a href="https://principlezheng.github.io/tags/mathjax" target="_blank">Mathjax</a></li>
-              
-              <li class="list-inline-item"><a href="https://principlezheng.github.io/tags/example" target="_blank">example</a></li>
+              <li class="list-inline-item"><a href="https://principlezheng.github.io/tags/ci/cd" target="_blank">CI/CD</a></li>
               
             </ul>
           </aside>
@@ -364,22 +383,22 @@ Render Math With Mathjax | Evan&#39;s Site
             <div class="social-content">
               <ul class="list-inline">
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fmath%2f">
+                  <a target="_blank" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fa-goimports-issue%2f">
                     <i class="fab fa-linkedin"></i>
                   </a>
                 </li>
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://twitter.com/share?text=Render%20Math%20With%20Mathjax&url=https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fmath%2f">
+                  <a target="_blank" href="https://twitter.com/share?text=Navigating%20CI%2fCD%20Hurdles%3a%20A%20Goimports%20Issue%20During%20PR%20Submission&url=https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fa-goimports-issue%2f">
                     <i class="fab fa-twitter"></i>
                   </a>
                 </li>
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href="https://api.whatsapp.com/send?text=Render%20Math%20With%20Mathjax: https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fmath%2f">
+                  <a target="_blank" href="https://api.whatsapp.com/send?text=Navigating%20CI%2fCD%20Hurdles%3a%20A%20Goimports%20Issue%20During%20PR%20Submission: https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fa-goimports-issue%2f">
                     <i class="fab fa-whatsapp"></i>
                   </a>
                 </li>
                 <li class="list-inline-item text-center">
-                  <a target="_blank" href='mailto:?subject=Render%20Math%20With%20Mathjax&amp;body=Check%20out%20this%20site https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fmath%2f'>
+                  <a target="_blank" href='mailto:?subject=Navigating%20CI%2fCD%20Hurdles%3a%20A%20Goimports%20Issue%20During%20PR%20Submission&amp;body=Check%20out%20this%20site https%3a%2f%2fprinciplezheng.github.io%2fblogs%2fa-goimports-issue%2f'>
                     <i class="fa fa-envelope"></i>
                   </a>
                 </li>
@@ -675,24 +694,6 @@ Given a non-empty array of integers nums, every element appears twice …</p>
 
 
 
-
-
-<!-- MathJax -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" integrity="sha384-M5jmNxKC9EVnuqeMwRHvFuYUE8Hhp0TgBruj/GZRkYtiMrCRgH7yvv5KY+Owi7TW" crossorigin="anonymous"></script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [['\\(','\\)']],
-        displayMath: [['$$','$$'], ['\[','\]']],
-        processEscapes: true,
-        processEnvironments: true,
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-        TeX: { equationNumbers: { autoNumber: "AMS" },
-             extensions: ["AMSmath.js", "AMSsymbols.js"] }
-      }
-    });
-</script>
 
 
 
